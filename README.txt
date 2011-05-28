@@ -1,0 +1,34 @@
+=== UpDownUpDown ===
+Contributors: dkonopka
+Tags: voting, votes, posts, comments
+Requires at least: 3.0
+Tested up to: 3.1.3
+Stable tag: trunk
+
+Simple WordPress plugin for up/down voting on posts and comments.
+
+== Description ==
+
+UpDownUpDown provides two template tags for adding up/down voting for any post or comment for logged in users. Non-loggedin users see a view-only up/down vote count badge without voting buttons.
+
+== Installation ==
+
+1. Upload the folder containing the plugin to the `/wp-content/plugins/` directory
+1. Activate the plugin through the 'Plugins' menu in WordPress
+1. Place the following function calls in your templates, somewhere inside the post or comment loop:
+  1. `<?php if(function_exists('up_down_post_votes')) { up_down_post_votes( get_the_ID() ); } ?>`
+  1. `<?php if(function_exists('up_down_comment_votes')) { up_down_comment_votes( get_comment_ID() ); } ?>`
+1. Display vote badge display only with no voting by setting the second parameter to false:
+  1. `<?php if(function_exists('up_down_post_votes')) { up_down_post_votes( get_the_ID(), false ); } ?>`
+  1. `<?php if(function_exists('up_down_comment_votes')) { up_down_comment_votes( get_comment_ID(), false ); } ?>`
+
+== Screenshots ==
+
+1. This shows a badge in a post with no votes yet.
+2. This shows a badge in a post with a vote set.
+3. This shows a view-only badge that non-logged in users will see or all users will see if voting is disabled via theme function flag.
+
+== Changelog ==
+
+= 1.0 =
+* Initial release.
