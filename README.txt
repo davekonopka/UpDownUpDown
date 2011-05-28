@@ -11,6 +11,8 @@ Simple WordPress plugin for up/down voting on posts and comments.
 
 UpDownUpDown provides two template tags for adding up/down voting for any post or comment for logged in users. Non-loggedin users see a view-only up/down vote count badge without voting buttons.
 
+This plugin was developed as a project of Wharton Research Data Services.
+  
 == Installation ==
 
 1. Upload the folder containing the plugin to the `/wp-content/plugins/` directory
