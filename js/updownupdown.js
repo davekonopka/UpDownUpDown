@@ -23,7 +23,7 @@ jQuery(document).ready(function(){
 
   function handleVoteCallback( response ) {
 
-    var vote_response = JSON.parse(response);
+    var vote_response = jQuery.parseJSON(response);
     if ( vote_response.status == 1 ) {
       //Success, update vote count
       
