@@ -3,7 +3,7 @@
 Plugin Name: UpDownUpDown
 Plugin URI: http://davekonopka.com/updownupdown
 Description: Up/down voting for posts and comments
-Version: 1.0
+Version: 1.01
 Author: Dave Konopka
 Author URI: http://davekonopka.com
 License: GPL2
