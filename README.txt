@@ -34,7 +34,7 @@ This plugin was developed as a project of Wharton Research Data Services.
 
 == Changelog ==
 
-= 1.01 =
+= 1.0.1 =
 * Replaced JavaScript JSON.parse reference with jQuery.parseJSON to accommodate browsers without native JSON support. In IE7 votes were registering on the server but not updating in the browser without a refresh. Now it's fixed in IE7.
 
 = 1.0 =
