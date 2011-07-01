@@ -43,11 +43,11 @@ div.updown-down-count {
   font-weight: bold;
 }
 
-div.updown-up-count {
+div.updown-up-count, div.updown-pos-count {
   color: #5ebc40;
 }
 
-div.updown-down-count {
+div.updown-down-count, div.updown-neg-count {
   color: #bb5853;
 }
 
