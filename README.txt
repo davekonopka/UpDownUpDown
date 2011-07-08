@@ -25,12 +25,15 @@ This plugin was initially developed as a project of Wharton Research Data Servic
 1. Display vote badge display only with no voting by setting the second parameter to false:
   1. `<?php if(function_exists('up_down_post_votes')) { up_down_post_votes( get_the_ID(), false ); } ?>`
   1. `<?php if(function_exists('up_down_comment_votes')) { up_down_comment_votes( get_comment_ID(), false ); } ?>`
+1. Visit the plugin settings page to customize it.
 
 == Screenshots ==
 
 1. This shows a badge in a post with no votes yet.
 2. This shows a badge in a post with a vote set.
-3. This shows a view-only badge that non-logged in users will see or all users will see if voting is disabled via theme function flag.
+3. This shows a view-only badge if voting is disabled via theme function flag or guest voting is disabled in the admin settings.
+4. This shows a badge using the alternate simple style.
+5. Admin settings page for the plugin.
 
 == Changelog ==
 
@@ -38,9 +41,9 @@ This plugin was initially developed as a project of Wharton Research Data Servic
 * Release includes major contributions by Martin Scharm <martin@binfalse.de>
 * Added admin page
 * Added option to allow guest-votes
-* Second style
+* Added option to select from multiple styles, added simple styling
 * Choose between up/down counts or a total count
-* Deleted some XHTML errors
+* Fixed some XHTML errors
 
 = 1.0.1 =
 * Replaced JavaScript JSON.parse reference with jQuery.parseJSON to accommodate browsers without native JSON support. In IE7 votes were registering on the server but not updating in the browser without a refresh. Now it's fixed in IE7.
