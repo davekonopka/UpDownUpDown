@@ -37,6 +37,11 @@ div.updown-vote-box div.updown-down-count {
   margin: 6px 0;
 }
 
+div.updown-vote-box div.updown-down-count,
+div.updown-vote-box div.updown-total-count {
+  margin-bottom: 8px;
+}
+
 div.updown-up-count,
 div.updown-down-count {
   font-size: 12pt;
