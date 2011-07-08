@@ -54,7 +54,6 @@ if (!class_exists("UpDownPostCommentVotes"))
 			if (get_option("updown_db_version")) {
 				if (get_option("updown_db_version") != $updown_db_version)
 					die ("downgrade not supported!!!"); // there is no prev version using this var
-				// we are latest version
 				return;
 			}
 			
