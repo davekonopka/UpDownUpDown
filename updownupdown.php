@@ -112,7 +112,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 			}
 			else
 			{
-				// since we don't know whether altering table is supported...
+				// Since we're updating an existing column data type, create new tables and copy over existing votes
 				$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_post_vote (
 					id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
 					post_id bigint(20) unsigned NOT NULL,
