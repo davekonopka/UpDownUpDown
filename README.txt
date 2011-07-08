@@ -9,11 +9,11 @@ Simple WordPress plugin for up/down voting on posts and comments.
 
 == Description ==
 
-UpDownUpDown provides two template tags for adding up/down voting for any post or comment for logged in users. Non-loggedin users see a view-only up/down vote count badge without voting buttons. Votes are registered on the server without refreshing the page.
+UpDownUpDown provides two template tags for adding up/down voting for any post or comment for logged in users. Anonymous guest visitors can either be allowed to vote (tracked by ip address) or be denied voting and shown a view-only vote count badge. Votes are registered on the server without refreshing the page.
 
 Fork the Github repo: [https://github.com/davekonopka/updownupdown](https://github.com/davekonopka/updownupdown)
 
-This plugin was developed as a project of Wharton Research Data Services.
+This plugin was originally developed as a project of Wharton Research Data Services.
   
 == Installation ==
 
@@ -33,6 +33,14 @@ This plugin was developed as a project of Wharton Research Data Services.
 3. This shows a view-only badge that non-logged in users will see or all users will see if voting is disabled via theme function flag.
 
 == Changelog ==
+
+= 1.1 =
+* Release includes major contributions by Martin Scharm <martin@binfalse.de>
+* Added admin page
+* Added option to allow guest-votes
+* Second style
+* Choose between up/down counts or a total count
+* Deleted some XHTML errors
 
 = 1.0.1 =
 * Replaced JavaScript JSON.parse reference with jQuery.parseJSON to accommodate browsers without native JSON support. In IE7 votes were registering on the server but not updating in the browser without a refresh. Now it's fixed in IE7.
