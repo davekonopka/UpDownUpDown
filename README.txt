@@ -13,7 +13,7 @@ UpDownUpDown provides two template tags for adding up/down voting for any post o
 
 Fork the Github repo: [https://github.com/davekonopka/updownupdown](https://github.com/davekonopka/updownupdown)
 
-This plugin was originally developed as a project of Wharton Research Data Services.
+This plugin was initially developed as a project of Wharton Research Data Services.
   
 == Installation ==
 
