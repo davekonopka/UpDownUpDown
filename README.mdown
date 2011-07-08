@@ -31,7 +31,7 @@ This plugin was initially developed as a project of Wharton Research Data Servic
 ## Changelog ##
 
 # 1.1 #
-* Release includes major contributions by Martin Scharm <martin@binfalse.de>
+* Release includes major contributions by Martin Scharm
 * Added admin page
 * Added option to allow guest-votes
 * Added option to select from multiple styles, added simple styling
