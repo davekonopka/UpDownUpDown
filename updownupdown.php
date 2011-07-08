@@ -3,7 +3,7 @@
  * Plugin Name: UpDownUpDown
  * Plugin URI: http://davekonopka.com/updownupdown
  * Description: Up/down voting for posts and comments
- * Version: 1.0.1
+ * Version: 1.1
  * Author: Dave Konopka, Martin Scharm
  * Author URI: http://davekonopka.com
  * License: GPL2
@@ -549,18 +549,18 @@ if (!class_exists("UpDownPostCommentVotes"))
 		
 		// permissions
 		$allow_guests = get_option ("updown_guest_allowed") == "allowed" ? "checked " : "";
-		echo '<tr valign="top"><th>Allow guests to vote:</th><td><input type="checkbox" name="guest_allowed" '.$allow_guests.'/> <span class="description">Are visitors allowed to vote w/o login</span></td></tr>';
+		echo '<tr valign="top"><th>Allow guests to vote:</th><td><input type="checkbox" name="guest_allowed" '.$allow_guests.'/> <span class="description">Allow guest visitors to vote without login? (Votes tracked by ip address)</span></td></tr>';
 		
 		//style
 		$selected = "";
-		echo '<tr valign="top"><th>Choose style:</th><td><select name="style">';
+		echo '<tr valign="top"><th>Badge style:</th><td><select name="style">';
 		if (get_option ("updown_css") == "default") $selected = "selected ";
 		else $selected = "";
 		echo '<option value="default"'.$selected.'>default</option>';
 		if (get_option ("updown_css") == "simple") $selected = "selected ";
 		else $selected = "";
 		echo '<option value="simple"'.$selected.'>simple</option>';
-		echo '</select> <span class="description">Choose between the styles, try out to find the one that you like most</span></td></tr>';
+		echo '</select> <span class="description">Choose basic badge style. You can also override CSS in your theme.</span></td></tr>';
 		
 		// counter type
 		echo '<tr valign="top"><th>Counter type:</th><td>';
@@ -574,7 +574,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 		else
 			$selected = "";
 		echo '<input type="radio" name="counter" value="total" '.$selected.'/> Total ';
-		echo ' <span class="description">Do you want to see the positive and negative counts, or only the total score?</td></tr>';
+		echo ' <span class="description">Do you want to see the positive and negative counts, or only a total score?</td></tr>';
 		
 		// sign?
 		echo '<tr valign="top"><th>Sign total counter:</th><td>';
