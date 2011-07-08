@@ -9,7 +9,7 @@ Simple WordPress plugin for up/down voting on posts and comments.
 
 == Description ==
 
-UpDownUpDown provides two template tags for adding up/down voting for any post or comment for logged in users. Anonymous guest visitors can either be allowed to vote (tracked by ip address) or be denied voting and shown a view-only vote count badge. Votes are registered on the server without refreshing the page.
+UpDownUpDown provides two template tags for adding up/down voting for any post or comment. Anonymous guest visitors can either be allowed to vote (tracked by ip address) or be denied voting and shown a view-only vote count badge. Votes are registered on the server without refreshing the page.
 
 Fork the Github repo: [https://github.com/davekonopka/updownupdown](https://github.com/davekonopka/updownupdown)
 
