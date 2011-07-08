@@ -1,49 +1,54 @@
 div.updown-vote-box {
-	padding: 8px;
-	margin-left: 3px;
-	margin-right: 15px;
-	max-width: 80px;
-	text-align: center;
-	float: left;
+  padding: 8px;
+  margin-left: 3px;
+  margin-right: 15px;
+  width: 40px;
+  text-align: center;
+  float: left;
 }
 
 div.updown-vote-box div {
-	margin: 0;
-	padding: 0;
-	line-height: 100%;
+  margin: 0;
+  padding: 0;
+  line-height: 100%;
+}
+
+div.updown-vote-box div.updown-up-count,
+div.updown-vote-box div.updown-down-count,
+div.updown-vote-box div.updown-total-count {
+  margin: 3px 0;
+}
+
+div.updown-vote-box div.updown-down-count,
+div.updown-vote-box div.updown-total-count {
+  margin-bottom: 8px;
 }
 
 div.updown-up-count,
-div.updown-total-count,
 div.updown-down-count {
-	font-size: 28px !important;
-	line-height: 25px !important;
-	font-family: "DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New",Courier,Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter",monospace;
-	font-weight: bold;
+  font-size: 12pt;
+  font-weight: bold;
 }
 
 div.updown-up-count, div.updown-pos-count {
-	color: #5ebc40;
+  color: #5ebc40;
 }
 
 div.updown-down-count, div.updown-neg-count {
-	color: #bb5853;
+  color: #bb5853;
 }
 
 div.updown-active {
-	margin-left: -.5em !important;
+  margin-left: -.5em !important;
 }
 
 img.updown-button {
-	cursor: pointer;
-	border: 0;
-	margin: 0;
-	padding: 0;
+  cursor: pointer;
 }
 
 div.updown-vote-box div.updown-label {}
 
 div.updown-vote-box div.updown-label {
-	font-size: 80%;
-	margin: 4px 0;
+  font-size: 80%;
+  margin: 4px 0;
 }
