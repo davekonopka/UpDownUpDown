@@ -545,7 +545,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 			update_option ("updown_votes_text", trim ($_POST['votestext']));
 		}
 		
-		echo '<div class="wrap"><h2>UpDown Plugin</h2><form name="form1" method="post" action=""><table width="100%" cellpadding="5" class="form-table"><tbody>';
+		echo '<div class="wrap"><h2>UpDownUpDown Plugin Settings</h2><form name="form1" method="post" action=""><table width="100%" cellpadding="5" class="form-table"><tbody>';
 		
 		// permissions
 		$allow_guests = get_option ("updown_guest_allowed") == "allowed" ? "checked " : "";
