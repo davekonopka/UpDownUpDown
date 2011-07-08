@@ -60,109 +60,88 @@ if (!class_exists("UpDownPostCommentVotes"))
 			if ( !empty($wpdb->charset) )
 				$charset_collate = "DEFAULT CHARACTER SET ".$wpdb->charset;
 
-			# check whether we are an update
-			if($wpdb->get_var("SHOW TABLES LIKE '".$wpdb->base_prefix."up_down_post_votes'") != $wpdb->base_prefix."up_down_post_votes")
-			{
-				$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_post_vote_totals (
-							id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-							post_id bigint(20) NOT NULL,
-							vote_count_up bigint(20) NOT NULL DEFAULT '0',
-							vote_count_down bigint(20) NOT NULL DEFAULT '0',
-							KEY post_id (post_id),
-							CONSTRAINT UNIQUE (post_id)
-				) ".$charset_collate.";";
+			$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_post_vote_totals (
+						id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+						post_id bigint(20) NOT NULL,
+						vote_count_up bigint(20) NOT NULL DEFAULT '0',
+						vote_count_down bigint(20) NOT NULL DEFAULT '0',
+						KEY post_id (post_id),
+						CONSTRAINT UNIQUE (post_id)
+			) ".$charset_collate.";";
 
-				$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_post_vote (
-							id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-							post_id bigint(20) unsigned NOT NULL,
-					voter_id varchar(32) NOT NULL DEFAULT '',
-							vote_value int(11) NOT NULL DEFAULT '0',
-							KEY post_id (post_id),
-							KEY voter_id (voter_id),
-							KEY post_voter (post_id, voter_id),
-							CONSTRAINT UNIQUE (post_id, voter_id)
-				) ".$charset_collate.";";
+			$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_post_vote (
+						id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+						post_id bigint(20) unsigned NOT NULL,
+						voter_id varchar(32) NOT NULL DEFAULT '',
+						vote_value int(11) NOT NULL DEFAULT '0',
+						KEY post_id (post_id),
+						KEY voter_id (voter_id),
+						KEY post_voter (post_id, voter_id),
+						CONSTRAINT UNIQUE (post_id, voter_id)
+			) ".$charset_collate.";";
 
-				$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_comment_vote_totals (
-							id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-							comment_id bigint(20) unsigned	NOT NULL,
-							post_id bigint(20) unsigned NOT NULL,
-							vote_count_up bigint(20) NOT NULL DEFAULT '0',
-							vote_count_down bigint(20) NOT NULL DEFAULT '0',
-							KEY post_id (post_id),
-							KEY comment_id (comment_id),
-							CONSTRAINT UNIQUE (comment_id)
-				) ".$charset_collate.";";
+			$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_comment_vote_totals (
+						id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+						comment_id bigint(20) unsigned	NOT NULL,
+						post_id bigint(20) unsigned NOT NULL,
+						vote_count_up bigint(20) NOT NULL DEFAULT '0',
+						vote_count_down bigint(20) NOT NULL DEFAULT '0',
+						KEY post_id (post_id),
+						KEY comment_id (comment_id),
+						CONSTRAINT UNIQUE (comment_id)
+			) ".$charset_collate.";";
 
-				$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_comment_vote (
-							id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-							comment_id bigint(20) unsigned NOT NULL,
-							post_id bigint(20) unsigned NOT NULL,
-					voter_id varchar(32) NOT NULL DEFAULT '',
-							vote_value int(11) NOT NULL DEFAULT '0',
-							KEY comment_id (comment_id),
-							KEY post_id (post_id),
-							KEY voter_id (voter_id),
-							KEY post_voter (post_id, voter_id),
-							KEY comment_voter (comment_id, voter_id),
-							CONSTRAINT UNIQUE (comment_id, voter_id)
-				) ".$charset_collate.";";
-				dbDelta ($sql);
-			}
-			else
-			{
-				// Since we're updating an existing column data type, create new tables and copy over existing votes
-				$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_post_vote (
-					id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-					post_id bigint(20) unsigned NOT NULL,
-					voter_id varchar(32) NOT NULL DEFAULT '',
-					vote_value int(11) NOT NULL DEFAULT '0',
-					KEY post_id (post_id),
-					KEY voter_id (voter_id),
-					KEY post_voter (post_id, voter_id),
-					CONSTRAINT UNIQUE (post_id, voter_id)
-				) ".$charset_collate.";";
+			$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_comment_vote (
+						id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+						comment_id bigint(20) unsigned NOT NULL,
+						post_id bigint(20) unsigned NOT NULL,
+						voter_id varchar(32) NOT NULL DEFAULT '',
+						vote_value int(11) NOT NULL DEFAULT '0',
+						KEY comment_id (comment_id),
+						KEY post_id (post_id),
+						KEY voter_id (voter_id),
+						KEY post_voter (post_id, voter_id),
+						KEY comment_voter (comment_id, voter_id),
+						CONSTRAINT UNIQUE (comment_id, voter_id)
+			) ".$charset_collate.";";
 
-				$sql[] = "CREATE TABLE ".$wpdb->base_prefix."up_down_comment_vote (
-					id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-					comment_id bigint(20) unsigned NOT NULL,
-					post_id bigint(20) unsigned NOT NULL,
-					voter_id varchar(32) NOT NULL DEFAULT '',
-					vote_value int(11) NOT NULL DEFAULT '0',
-					KEY comment_id (comment_id),
-					KEY post_id (post_id),
-					KEY voter_id (voter_id),
-					KEY post_voter (post_id, voter_id),
-					KEY comment_voter (comment_id, voter_id),
-					CONSTRAINT UNIQUE (comment_id, voter_id)
-				) ".$charset_collate.";";
+			dbDelta ($sql);
 
-			dbDelta($sql);
-
-				$result_query = $wpdb->get_results($wpdb->prepare("
-				SELECT * FROM ".$wpdb->base_prefix."up_down_post_votes"));
+			# If old style post vote logging table exists, port records over to new logging table
+			if( $wpdb->get_var("SHOW TABLES LIKE '".$wpdb->base_prefix."up_down_post_votes'") == $wpdb->base_prefix."up_down_post_votes" ) {
 				
-				foreach ($result_query as $value)
-				{
+				// Port post vote logs
+				$result_query = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix."up_down_post_votes"));
+				
+				foreach ( $result_query as $value ) {
 					$wpdb->insert ($wpdb->base_prefix."up_down_post_vote",
 						array ('post_id' => $value->post_id,
 										'voter_id' => $value->voter_id,
 										'vote_value' => $value->vote_value));
-		}
-
-				$result_query = $wpdb->get_results($wpdb->prepare("
-				SELECT * FROM ".$wpdb->base_prefix."up_down_comment_votes"));
+				}
 				
-				foreach ($result_query as $value)
-				{
+				//Drop old post log table
+				$wpdb->query( 'DROP TABLE IF EXISTS '.$wpdb->base_prefix."up_down_post_votes");
+			}
+
+			# If old style comment vote logging table exists, port records over to new logging table
+			if( $wpdb->get_var("SHOW TABLES LIKE '".$wpdb->base_prefix."up_down_comment_votes'") == $wpdb->base_prefix."up_down_comment_votes" ) {
+			
+				// Port comment vote logs
+				$result_query = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix."up_down_comment_votes"));
+				
+				foreach ( $result_query as $value ) {
 					$wpdb->insert ($wpdb->base_prefix."up_down_comment_vote",
 						array ('comment_id' => $value->comment_id,
 							'post_id' => $value->post_id,
 							'voter_id' => $value->voter_id,
 							'vote_value' => $value->vote_value));
 				}
+
+				//Drop old comment log table
+				$wpdb->query( 'DROP TABLE IF EXISTS '.$wpdb->base_prefix."up_down_comment_votes");
 			}
-			
+
 			update_option ("updown_db_version", $updown_db_version);
 			
 			if (!get_option ("updown_guest_allowed"))
