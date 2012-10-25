@@ -26,7 +26,20 @@ This plugin was initially developed as a project of Wharton Research Data Servic
   1. `<?php if(function_exists('up_down_post_votes')) { up_down_post_votes( get_the_ID(), false ); } ?>`
   1. `<?php if(function_exists('up_down_comment_votes')) { up_down_comment_votes( get_comment_ID(), false ); } ?>`
 1. Visit the plugin settings page to customize it.
+1. If you want sort your comments by total votes, just add this code BEFORE the comment loop on comments.php file:
 
+```
+global $wp_query;
+$comment_arr = $wp_query->comments; usort($comment_arr, 'comment_comparator');
+```
+
+And then add `$comment_arr` to `wp_list_comments` function:
+
+```
+wp_list_comments('callback=your_callback_name', $comment_arr);
+```
+
+Where `your_callback_name` is the function you use to render your comments.
 == Screenshots ==
 
 1. This shows a badge in a post with no votes yet.

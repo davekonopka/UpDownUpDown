@@ -482,6 +482,29 @@ if (!class_exists("UpDownPostCommentVotes"))
 		echo '</div>';
 	}
 
+	//********************************************************************
+	// Sorting functions
+	
+	function up_down_comment_votes_only_total( $comment_id ) {
+    	global $up_down_plugin;
+    	if ( !$comment_id )
+        	return 0;   
+    	$vote_counts = $up_down_plugin->get_comment_votes_total( $comment_id );
+    	return $vote_counts["up"] -  $vote_counts["down"] ;
+	}
+
+	function comment_comparator($a, $b) {
+		$cmp = 0;
+		if ($a->comment_ID != $b->comment_ID) {
+			$votes_a = up_down_comment_votes_only_total( $a->comment_ID );
+			$votes_b = up_down_comment_votes_only_total( $b->comment_ID );
+			if ($votes_a != $votes_b)
+				$cmp = $votes_a > $votes_b?-1:1;
+			else
+				$cmp = strtotime($a->comment_date) < strtotime($b->comment_date)?-1:1;
+		}
+		return $cmp;
+	}
 	
 	//********************************************************************
 	// Admin page
