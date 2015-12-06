@@ -49,7 +49,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 		public function setup_plugin() {
 			global $wpdb;
 			global $updown_db_version;
-			require_once( ABSPATH . 'wp-admin/upgrade-functions.php' );
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 			if (get_option("updown_db_version")) {
 				if (get_option("updown_db_version") != $updown_db_version)
