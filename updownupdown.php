@@ -1,14 +1,15 @@
 <?php
 /*
- * Plugin Name: UpDownUpDown
- * Plugin URI: http://davekonopka.com/updownupdown
+ * Plugin Name: UpDownUpDownWithSorting
+ * Plugin URI: https://github.com/Firmware-Repairman/UpDownUpDownWithSorting
  * Description: Up/down voting for posts and comments
- * Version: 1.1
- * Author: Dave Konopka, Martin Scharm
- * Author URI: http://davekonopka.com
+ * Version: 2.0
+ * Author: Craig Mautner
+ * Author URI: 
  * License: GPL2
  *
  *	Copyright 2011 Dave Konopka (email : dave.konopka@gmail.com)
+ *	Copyright 2023 Craig Mautner (email : craig.mautner@gmail.com)
  *
  *		This program is free software; you can redistribute it and/or modify
  *		it under the terms of the GNU General Public License, version 2, as
@@ -27,7 +28,8 @@
  *		A complete version of this license can be found here:
  *		http://www.gnu.org/licenses/gpl-2.0.html
  *
- *	This plugin was initially developed as a project of Wharton Research Data Services.
+ *	2011 This plugin was initially developed as a project of Wharton Research Data Services.
+ *	2023 This plugin was updated and enhanced as a project for Mission Local
 */
 
 if (!class_exists("UpDownPostCommentVotes"))
@@ -154,6 +156,8 @@ if (!class_exists("UpDownPostCommentVotes"))
 				update_option ("updown_vote_text", "vote");
 			if (!get_option ('updown_votes_text'))
 				update_option ("updown_votes_text", "votes");
+			if (!get_option ('updown_sort_comments_by_net_votes'))
+				update_option ("updown_sort_comments_by_net_votes", "yes");
 		}
 
 		public function init_plugin()
@@ -453,6 +457,10 @@ if (!class_exists("UpDownPostCommentVotes"))
 		}
 
 		function sort_comments( $comments, $post_id ) {
+			if ( get_option( 'updown_sort_comments_by_net_votes' ) === "no" ) {
+				return $comments;
+			}
+			
 			global $wpdb;
 			// Port post vote logs
 			$result_query = $wpdb->get_results($wpdb->prepare(
@@ -565,7 +573,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 
 	function updown_plugin_menu()
 	{
-		add_options_page('UpDown Options', 'UpDownUpDown', 'manage_options', 'updown_plugin_menu_id', 'updown_options');
+		add_options_page('UpDown Options', 'UpDownUpDownWithSorting', 'manage_options', 'updown_plugin_menu_id', 'updown_options');
 }
 
 	function updown_options()
@@ -599,9 +607,12 @@ if (!class_exists("UpDownPostCommentVotes"))
 			// text
 			update_option ("updown_vote_text", trim ($_POST['votetext']));
 			update_option ("updown_votes_text", trim ($_POST['votestext']));
+
+			// sorting
+			update_option ("updown_sort_comments_by_net_votes", trim ($_POST['sort-by-up-votes']));
 		}
 
-		echo '<div class="wrap"><h2>UpDownUpDown Plugin Settings</h2><form name="form1" method="post" action=""><table width="100%" cellpadding="5" class="form-table"><tbody>';
+		echo '<div class="wrap"><h2>UpDownUpDownWithSorting Plugin Settings</h2><form name="form1" method="post" action=""><table width="100%" cellpadding="5" class="form-table"><tbody>';
 
 		// permissions
 		$allow_guests = get_option ("updown_guest_allowed") == "allowed" ? "checked " : "";
@@ -649,6 +660,20 @@ if (!class_exists("UpDownPostCommentVotes"))
 		//text
 		echo '<tr valign="top"><th>Vote label if voteable:</th><td><input type="text" name="votetext" value="'.get_option('updown_vote_text').'"/> <span class="description">Text on the bottom of the buttons if the visitor is allowed to vote (HTML allowed)</span></td></tr>';
 		echo '<tr valign="top"><th>Vote label if not voteable:</th><td><input type="text" name="votestext" value="'.get_option('updown_votes_text').'"/> <span class="description">Text on the bottom of the buttons if the visitor is <strong>not</strong> allowed to vote (HTML allowed)</span></td></tr>';
+
+		// sort comments by net up-votes?
+		echo '<tr valign="top"><th>Sort comments by up-votes?:</th><td>';
+		if (!get_option ("updown_sort_comments_by_net_votes") || get_option ("updown_sort_comments_by_net_votes") == "yes")
+			$selected = "checked ";
+		else
+			$selected = "";
+		echo '<input type="radio" name="sort-by-up-votes" value="yes" '.$selected.'/> Sort comments by up-votes ';
+		if (get_option ("updown_sort_comments_by_net_votes") == "no")
+			$selected = "checked ";
+		else
+			$selected = "";
+		echo '<input type="radio" name="sort-by-up-votes" value="no" '.$selected.'/> Sort comments by order entered ';
+		echo ' <span class="description">Should the comments be sorted by their up votes or in the order received?</span></td></tr>';
 
 		echo '</tbody></table>';
 
