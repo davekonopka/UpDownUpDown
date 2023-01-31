@@ -44,7 +44,8 @@ if (!class_exists("UpDownPostCommentVotes"))
 			add_action( 'wp_ajax_nopriv_register_vote', array( &$this, 'ajax_register_vote' ));
 			add_action( 'wp_head', array( &$this, 'add_ajax_url' ));
 			add_action( 'admin_menu', 'updown_plugin_menu' );
-			add_action( 'comments_?', array( &$this, 'sort_comments' ));
+			add_filter( 'comments_array', array( &$this, 'sort_comments' ), 10, 2 );
+			add_filter( 'comment_text', array( &$this, 'add_vote_to_comment' ), 10, 2 );
 		}
 
 		public function setup_plugin() {
@@ -178,7 +179,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 				 wp_register_script( 'updownupdown',
 						 plugins_url( '/js/updownupdown.js', __FILE__),
 						 array( 'jquery' ),
-						 '1.0' );
+						 '1.1' );
 				 wp_enqueue_script('updownupdown');
 			}
 		}
@@ -317,24 +318,26 @@ if (!class_exists("UpDownPostCommentVotes"))
 			else
 				$vote_label .= get_option ('updown_votes_text');
 
+			$text = "";
 			if ($votable)
-				echo '<div><img class="updown-button updown-up-button" vote-direction="1" src="'.$up_img_src.'"></div>';
+				$text .= '<div><img class="updown-button updown-up-button" vote-direction="1" src="'.$up_img_src.'"></div>';
 
 			if (get_option ("updown_counter_type") == "total")
 			{
-				echo '<div class="updown-total-count'.$updown_classnames.'" title="'.$vote_total_count_num.' vote'.($vote_total_count_num != 1 ? 's' : '').' so far">'.$vote_total_count.'</div>';
+				$text .= '<div class="updown-total-count'.$updown_classnames.'" title="'.$vote_total_count_num.' vote'.($vote_total_count_num != 1 ? 's' : '').' so far">'.$vote_total_count.'</div>';
 			}
 			else
 			{
-				echo '<div class="updown-up-count'.$up_classnames.'">'.$vote_up_count.'</div>';
-				echo '<div class="updown-down-count'.$down_classnames.'">'.$vote_down_count.'</div>';
+				$text .= '<div class="updown-up-count'.$up_classnames.'">'.$vote_up_count.'</div>';
+				$text .= '<div class="updown-down-count'.$down_classnames.'">'.$vote_down_count.'</div>';
 			}
 
 			if ($votable)
-				echo '<div><img class="updown-button updown-down-button" vote-direction="-1" src="'.$down_img_src.'"></div>';
+				$text .= '<div><img class="updown-button updown-down-button" vote-direction="-1" src="'.$down_img_src.'"></div>';
 
-			echo '<div class="updown-label">'.$vote_label.'</div>';
+			$text .= '<div class="updown-label">'.$vote_label.'</div>';
 
+			return $text;
 		}
 
 		//********************************************************************
@@ -421,11 +424,19 @@ if (!class_exists("UpDownPostCommentVotes"))
 					SET vote_count_up = (vote_count_up + %d),
 						vote_count_down = (vote_count_down + %d)
 					WHERE ".$element_name."_id = %d", $up_vote_delta, $down_vote_delta, $element_id)) == 0)
-				$wpdb->query($wpdb->prepare("
-				INSERT INTO ".$wpdb->base_prefix."up_down_".$element_name."_vote_totals
-					( vote_count_up, vote_count_down, ".$element_name."_id )
-					VALUES
-					( %d, %d, %d )", $up_vote_delta, $down_vote_delta, $element_id));
+				if ( $element_name == 'comment' ) {
+					$wpdb->query($wpdb->prepare("
+					INSERT INTO ".$wpdb->base_prefix."up_down_comment_vote_totals
+						( vote_count_up, vote_count_down, comment_id, post_id )
+						VALUES
+						( %d, %d, %d, %d )", $up_vote_delta, $down_vote_delta, $element_id, $post_id ));
+				} else {
+					$wpdb->query($wpdb->prepare("
+					INSERT INTO ".$wpdb->base_prefix."up_down_post_vote_totals
+						( vote_count_up, vote_count_down, post_id )
+						VALUES
+						( %d, %d, %d )", $up_vote_delta, $down_vote_delta, $element_id));
+				}
 
 			//Return success
 			$result["status"] = 1;
@@ -441,7 +452,8 @@ if (!class_exists("UpDownPostCommentVotes"))
 			die(json_encode($result));
 		}
 
-		function sort_comments( $post_id, $comments ) {
+		function sort_comments( $comments, $post_id ) {
+			global $wpdb;
 			// Port post vote logs
 			$result_query = $wpdb->get_results($wpdb->prepare(
 				"SELECT * FROM ".$wpdb->base_prefix."up_down_comment_vote_totals
@@ -457,39 +469,47 @@ if (!class_exists("UpDownPostCommentVotes"))
 			arsort( $net_votes );
 			arsort( $num_votes );
 
-			usort( $comments, function( $a, $b ) {
-				$id_a = $a->comment_id;
-				$id_b = $b->comment_id;
+			usort( $comments, function( $a, $b ) use ( $net_votes, $num_votes ) {
+				$a_id = $a->comment_ID;
+				$b_id = $b->comment_ID;
 
-				$a_defined = $net_votes[ $id_a ];
-				$b_defined = $net_votes[ $id_b ];
-				if ( ! $a_defined ) {
-					if ( ! $b_defined ) {
-						// neither has comments
+				$a_missing = ! array_key_exists( $a_id, $net_votes );
+				$b_missing = ! array_key_exists( $b_id, $net_votes );
+				if ( $a_missing ) {
+					// a has no votes
+					if ( $b_missing ) {
+						// neither a nor b has votes
 						return 0;
 					} else {
-						// a has no comments, but b does, b goes first
+						// a has no votes, but b does, b goes first
 						return 1;
 					}
-				} else if (! $b_defined ) {
-					// b has no comments, but a does, a goes first
+				} else if ($b_missing ) {
+					// b has no votes, but a does, a goes first
 					return -1;
 				}
 
-				$net_a = $net_votes[ $id_a ];
-				$net_b = $net_votes[ $id_b ];
-				if ( $net_a > $net_b) {
+				$a_net = $net_votes[ $a_id ];
+				$b_net = $net_votes[ $b_id ];
+				if ( $a_net > $b_net) {
 					// a has net more up votes than b
 					return -1;
-				} else if ( $net_a > $net_b) {
+				} else if ( $b_net > $a_net) {
 					// b has net more up votes than a
 					return 1;
 				} else {
 					// same number of net up votes, whichever did it with fewer down votes goes first
-					return $num_votes[ $id_a ] - $num_votes[ $id_b ];
+					return $num_votes[ $a_id ] - $num_votes[ $b_id ];
 				}
 			});
+
+			return $comments;
 		}
+
+		function add_vote_to_comment( $text, $comment ) {
+			return up_down_comment_votes( $comment->comment_ID ).$text;
+		}
+
 	} //class:UpDownPostCommentVotes
 
 	//Create instance of plugin
@@ -514,9 +534,12 @@ if (!class_exists("UpDownPostCommentVotes"))
 		$vote_counts = $up_down_plugin->get_post_votes_total( $post_id );
 		$existing_vote = $up_down_plugin->get_post_user_vote( $up_down_plugin->get_user_id(), $post_id );
 
-		echo '<div class="updown-vote-box updown-post" id="updown-post-'.$post_id.'" post-id="'.$post_id.'">';
+		$text = "";
+		$text .= '<div class="updown-vote-box updown-post" id="updown-post-'.$post_id.'" post-id="'.$post_id.'">';
 		$up_down_plugin->render_vote_badge( $vote_counts["up"], $vote_counts["down"], $allow_votes, $existing_vote );
-		echo '</div>';
+		$text .= '</div>';
+
+		return $text;
 	}
 
 	function up_down_comment_votes( $comment_id, $allow_votes = true ) {
@@ -528,9 +551,12 @@ if (!class_exists("UpDownPostCommentVotes"))
 		$vote_counts = $up_down_plugin->get_comment_votes_total( $comment_id );
 		$existing_vote = $up_down_plugin->get_comment_user_vote( $up_down_plugin->get_user_id(), $comment_id );
 
-		echo '<div class="updown-vote-box updown-comments" id="updown-comment-'.$comment_id.'" comment-id="'.$comment_id.'">';
-		$up_down_plugin->render_vote_badge( $vote_counts["up"], $vote_counts["down"], $allow_votes, $existing_vote );
-		echo '</div>';
+		$text = "";
+		$text .= '<div class="updown-vote-box updown-comments" id="updown-comment-'.$comment_id.'" comment-id="'.$comment_id.'">';
+		$text .= $up_down_plugin->render_vote_badge( $vote_counts["up"], $vote_counts["down"], $allow_votes, $existing_vote );
+		$text .= '</div>';
+
+		return $text;
 	}
 
 

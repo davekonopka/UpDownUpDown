@@ -127,7 +127,7 @@ jQuery(document).ready(function(){
     buttonObj.attr( 'src', buttonObj.attr( 'src' ).replace( '-on.png', '.png' ) );
   }
 
-	jQuery('.updown-button').live( 'click', function( event )
+	jQuery('.updown-button').on( 'click', function( event )
 	{
 		var id = jQuery(this).parent().parent().attr('id').split("-");
     var vote_value = -1;
