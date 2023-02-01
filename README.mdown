@@ -1,34 +1,44 @@
-# UpDownUpDown #
+# UpDownUpDownWithSorting #
 
 Simple WordPress plugin for up/down voting on posts and comments.
 
 ## Description ##
 
-UpDownUpDown provides two template tags for adding up/down voting for any post or comment. Anonymous guest visitors can either be allowed to vote (tracked by ip address) or be denied voting and shown a view-only vote count badge. Votes are registered on the server without refreshing the page.
+UpDownUpDownWithSorting a voting panel for adding up/down voting 
+for any post or comment. Anonymous guest visitors can either be allowed to vote
+(tracked by ip address) or be denied voting and shown a view-only vote count
+badge. Votes are registered on the server without refreshing the page.
+
+Comment voting can be optionally sorted in order or by net up votes.
 
 This plugin was initially developed as a project of Wharton Research Data Services.
+
+This plugin was updated for Mission Local by Craig Mautner
   
 ## Installation ##
 
 1. Upload the folder containing the plugin to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place the following function calls in your templates, somewhere inside the post or comment loop:
-  1. `<?php if(function_exists('up_down_post_votes')) { up_down_post_votes( get_the_ID() ); } ?>`
-  1. `<?php if(function_exists('up_down_comment_votes')) { up_down_comment_votes( get_comment_ID() ); } ?>`
-1. Display vote badge display only with no voting by setting the second parameter to false:
-  1. `<?php if(function_exists('up_down_post_votes')) { up_down_post_votes( get_the_ID(), false ); } ?>`
-  1. `<?php if(function_exists('up_down_comment_votes')) { up_down_comment_votes( get_comment_ID(), false ); } ?>`
 1. Visit the plugin settings page to customize it.
 
 ## Screenshots ##
 
 1. This shows a badge in a post with no votes yet.
+![](screenshot-1.png)
 2. This shows a badge in a post with a vote set.
+![](screenshot-2.png)
 3. This shows a view-only badge if voting is disabled via theme function flag or guest voting is disabled in the admin settings.
+![](screenshot-3.png)
 4. This shows a badge using the alternate simple style.
+![](screenshot-4.png)
 5. Admin settings page for the plugin.
+![](screenshot-5.png)
 
 ## Changelog ##
+
+# 2.0 #
+* Hooks to insert html into comments is done through WordPress filters rather than modifying themes
+* Comments may be sorted by net up-votes
 
 # 1.1 #
 * Release includes major contributions by Martin Scharm
