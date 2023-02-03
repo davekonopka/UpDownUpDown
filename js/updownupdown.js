@@ -12,10 +12,11 @@ jQuery(document).ready(function(){
       jQuery.post(UpDownUpDown.ajaxurl, data, function(response){ handleVoteCallback(response); });
   }
 
-  function voteComment( comment_id, direction ) {
+  function voteComment( comment_id, post_id, direction ) {
       var data = {
         action: 'register_vote',
         comment_id: comment_id,
+        post_id: post_id,
         direction: direction
       };
       jQuery.post(UpDownUpDown.ajaxurl, data, function(response){ handleVoteCallback(response); });
@@ -26,24 +27,22 @@ jQuery(document).ready(function(){
     var vote_response = jQuery.parseJSON(response);
     if ( vote_response.status == 1 ) {
       //Success, update vote count
-      
-      if ( vote_response.post_id ) {
-        var element_name = 'post';
-        var element_id = vote_response.post_id;
-      } else if ( vote_response.comment_id ) {
-        var element_name = 'comment';
-        var element_id = vote_response.comment_id;
-      }
-      
-      var vote_up_count = jQuery( '#updown-' + element_name + '-' + element_id + ' .updown-up-count' );
-      var vote_up_button = jQuery( '#updown-' + element_name + '-' + element_id + ' .updown-up-button' );
 
-			var vote_total_count = jQuery( '#updown-' + element_name + '-' + element_id + ' .updown-total-count' );
-			
-      var vote_down_count = jQuery( '#updown-' + element_name + '-' + element_id + ' .updown-down-count' );
-      var vote_down_button = jQuery( '#updown-' + element_name + '-' + element_id + ' .updown-down-button' );
+		if ( vote_response.comment_id ) {
+			var element_id = vote_response.comment_id;
+			var prefix = '#updown-comment-' + element_id + '-post-' + vote_response.post_id;
+		} else if ( vote_response.post_id ) {
+			var element_id = vote_response.post_id;
+			var prefix = '#updown-post-' + element_id;
+		}
 
-      var vote_label = jQuery( '#updown-' + element_name + '-' + element_id + ' .updown-label' );;
+      var vote_up_count = jQuery( prefix + ' .updown-up-count' );
+      var vote_up_button = jQuery( prefix + ' .updown-up-button' );
+
+			var vote_total_count = jQuery( prefix + ' .updown-total-count' );
+
+      var vote_down_count = jQuery( prefix + ' .updown-down-count' );
+      var vote_down_button = jQuery( prefix + ' .updown-down-button' );
 
       dehighlightButton( vote_down_button );
       dehighlightButton( vote_up_button );
@@ -87,7 +86,7 @@ jQuery(document).ready(function(){
 				vote_total_count.attr ("title", vote_total_count_num + " vote" + (vote_total_count_num == 1 ? "" : "s") + " so far");
 			}
 			vote_total_count.text(vote_total_count_text);
-			
+
 			if ( vote_response.vote_totals.up == 0 && vote_response.vote_totals.down == 0)
 			{
 				if (vote_up_count.length)
@@ -103,7 +102,7 @@ jQuery(document).ready(function(){
 					vote_response.vote_totals.up = "+" + vote_response.vote_totals.up;
 				if ( vote_response.vote_totals.down > 0 )
 					vote_response.vote_totals.down = "-" + vote_response.vote_totals.down;
-        
+
 				if (vote_up_count.length)
         vote_up_count.text(vote_response.vote_totals.up).show();
 				if (vote_down_count.length)
@@ -113,8 +112,8 @@ jQuery(document).ready(function(){
       }
     } else {
       //Failure, notify user
-      if ( vote_response.message  != null ) { 
-        alert( vote_response.message ); 
+      if ( vote_response.message  != null ) {
+        alert( vote_response.message );
       }
     }
   }
@@ -142,7 +141,7 @@ jQuery(document).ready(function(){
 		if (id[1] == "post" && id[2])
 			votePost(id[2], vote_value );
 		if (id[1] == "comment" && id[2])
-			voteComment(id[2], vote_value );
+			voteComment(id[2], id[4], vote_value );
   });
 
 });

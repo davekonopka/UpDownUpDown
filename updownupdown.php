@@ -5,7 +5,7 @@
  * Description: Up/down voting for posts and comments
  * Version: 2.0
  * Author: Craig Mautner
- * Author URI: 
+ * Author URI:
  * License: GPL2
  *
  *	Copyright 2011 Dave Konopka (email : dave.konopka@gmail.com)
@@ -374,14 +374,13 @@ if (!class_exists("UpDownPostCommentVotes"))
 			$post_id = $_POST['post_id'];
 			$comment_id = $_POST['comment_id'];
 
-			if ( $post_id != null ) {
-				$element_name = 'post';
-				$element_id = $post_id;
-			} elseif ( $comment_id != null ) {
+			if ( $comment_id != null ) {
 				$element_name = 'comment';
 				$element_id = $comment_id;
-			}
-			else
+			} elseif ( $post_id != null ) {
+				$element_name = 'post';
+				$element_id = $post_id;
+			} else
 				die(json_encode($result));
 
 			$vote_value = $_POST['direction'];
@@ -398,7 +397,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 
 			if ( $element_name == 'post' )
 				$existing_vote = $this->get_post_user_vote( $user_id, $post_id );
-			elseif	( $element_name == 'comment' )
+			elseif ( $element_name == 'comment' )
 				$existing_vote = $this->get_comment_user_vote( $user_id, $comment_id );
 
 			if ( $existing_vote < 0 )
@@ -416,9 +415,9 @@ if (!class_exists("UpDownPostCommentVotes"))
 			} else {
 				$wpdb->query($wpdb->prepare("
 					INSERT INTO ".$wpdb->base_prefix."up_down_".$element_name."_vote
-					( vote_value, ".$element_name."_id, voter_id )
+					( vote_value, ".$element_name."_id, voter_id, post_id )
 					VALUES
-					( %d, %d, %s )", $vote_value, $element_id, $user_id ));
+					( %d, %d, %s, %d)", $vote_value, $element_id, $user_id, $post_id ));
 				$existing_vote = 0;
 			}
 
@@ -460,7 +459,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 			if ( get_option( 'updown_sort_comments_by_net_votes' ) === "no" ) {
 				return $comments;
 			}
-			
+
 			global $wpdb;
 			// Port post vote logs
 			$result_query = $wpdb->get_results($wpdb->prepare(
@@ -515,7 +514,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 		}
 
 		function add_vote_to_comment( $text, $comment ) {
-			return up_down_comment_votes( $comment->comment_ID ).$text;
+			return up_down_comment_votes( $comment->comment_ID, $comment->comment_post_ID ).$text;
 		}
 
 	} //class:UpDownPostCommentVotes
@@ -550,7 +549,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 		return $text;
 	}
 
-	function up_down_comment_votes( $comment_id, $allow_votes = true ) {
+	function up_down_comment_votes( $comment_id, $post_id, $allow_votes = true ) {
 		global $up_down_plugin;
 
 		if ( !$comment_id )
@@ -560,7 +559,7 @@ if (!class_exists("UpDownPostCommentVotes"))
 		$existing_vote = $up_down_plugin->get_comment_user_vote( $up_down_plugin->get_user_id(), $comment_id );
 
 		$text = "";
-		$text .= '<div class="updown-vote-box updown-comments" id="updown-comment-'.$comment_id.'" comment-id="'.$comment_id.'">';
+		$text .= '<div class="updown-vote-box updown-comments" id="updown-comment-'.$comment_id.'-post-'.$post_id.'" comment-id="'.$comment_id.'">';
 		$text .= $up_down_plugin->render_vote_badge( $vote_counts["up"], $vote_counts["down"], $allow_votes, $existing_vote );
 		$text .= '</div>';
 
